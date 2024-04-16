@@ -3,6 +3,7 @@ import { YX, yx } from "./YX.js";
 export class Panel {
     vec: YX;
     num: number;
+    inAnimation: boolean;
 
     static COLORS = [
         "silver", //num=0
@@ -25,6 +26,10 @@ export class Panel {
     constructor(vec: YX, num: number) {
         this.vec = vec;
         this.num = num;
+        this.inAnimation = true;
+        setTimeout(() => {
+            this.inAnimation = false;
+        }, 500);
     }
 
     // get vec() {

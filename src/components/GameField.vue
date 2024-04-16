@@ -3,9 +3,19 @@ import { ref, computed, onMounted } from "vue"
 import { YX, yx } from "./class/YX.js"
 import { Panel } from "./class/panel.ts"
 import { randomNum, emptyCells, randomSelect } from "./forPutPannel.ts"
+import GameOver from "./GameOver.vue"
+import GameClear from "./GameClear.vue"
+import { getHighScore, updateHighScore } from "./highScore.ts"
 
 
 const props = defineProps({ cellNum: Number })
+
+const score = ref(0);
+const highScore = ref(getHighScore(props.cellNum));
+
+const gameOver = ref(false);
+const gameClear = ref(false);
+const afterClear = ref(false);
 
 const cellSize = computed(() => (690 - (props.cellNum - 1) * 10) / props.cellNum)
 const cellNumTotal = computed(() => R.range(0, props.cellNum ** 2))
@@ -30,17 +40,13 @@ const position = computed(() => {
     return mat;
 })
 
-// const positionn = ref(new Array(props.cellNum).fill(null).map(_ => new Array(props.cellNum).fill(null)));
-// console.log(positionn.value);
-
+const transition = ref(false);
 
 const putPanel = () => {
     const vec = randomSelect(emptyCells(position.value))
     const panel = new Panel(vec, randomNum(props.cellNum))
 
     panels.value.push(panel);
-
-    //positionn.value[vec.y][vec.x]=panel
 }
 
 const panelStyle = (panel) => {
@@ -61,6 +67,8 @@ onMounted(() => {
 
     const html = document.querySelector("html");
     html.addEventListener("keydown", (e) => {
+
+        if (transition.value) return;
 
         function dir_(key) {
             switch (key) {
@@ -85,10 +93,11 @@ onMounted(() => {
 
         let nextGenePanels = [];
         let growPanels = [];
+        let moving = [];
 
         panels.value.forEach(elm => {
 
-            console.log("開始位置", elm.vec);
+            //console.log("開始位置", elm.vec);
 
             const dCAC = disapCondAndCount(nRPtoNum(elm.vec), elm.num)
 
@@ -98,30 +107,87 @@ onMounted(() => {
 
 
             const moveLength = dist(elm.vec) - nRPtoNum(elm.vec).length + dCAC[1];
-            console.log("移動距離", moveLength);
+            //console.log("移動距離", moveLength);
 
             if (dCAC[0]) {
-                console.log("消失");
+                //console.log("消失");
                 growPanels.push(YX.add(elm.vec, YX.scalar(moveLength, dir)))
 
 
             } else {
-                console.log("消えず");
+                //console.log("消えず");
 
                 nextGenePanels.push([elm, YX.scalar(moveLength, dir)])
             }
+
+            moving.push([elm, moveLength]);
         })
-        console.log("..................");
+
+        if (moving.every(elm => elm[1] === 0)) return;
 
         //panels.value = nextGenePanels;
-        panels.value = [];
-        nextGenePanels.forEach(elm => {
-            elm[0].slide(elm[1])
-            panels.value.push(elm[0]);
+        transition.value = true;
+        moving.forEach(elm => {
+            elm[0].slide(YX.scalar(elm[1], dir));
         })
-        nextGenePanels = [];
 
-        putPanel();
+        new Promise(resolve => {
+            setTimeout(() => {
+                resolve();
+            }, 300)
+        }).then(() => {
+            transition.value = false;
+
+            panels.value = [];
+            nextGenePanels.forEach(elm => {
+                //elm[0].slide(elm[1])
+                panels.value.push(elm[0]);
+            })
+            nextGenePanels = [];
+
+            growPanels.forEach((elm) => {
+                const panel = panels.value.find(pa => {
+                    return pa.vec.y === elm.y && pa.vec.x === elm.x;
+                })
+                panel.grow();
+                score.value += 2 ** (panel.num + 1)
+            })
+
+            putPanel();
+
+            //ゲームクリア
+            if (isGameClear() && afterClear.value) {
+                console.log("clear");
+                gameClear.value = true;
+                updateHighScore(props.cellNum, score.value);
+
+            }
+            //ゲームオーバー
+            else if (panels.value.length === props.cellNum ** 2
+                && noMove(position.value)
+            ) {
+                gameOver.value = true;
+                updateHighScore(props.cellNum, score.value);
+            }
+            function noMove(matrix) {
+                const f = (mat) =>
+                    mat.every((arr) => {
+                        const row = arr.map((elm) => elm.num);
+                        return R.range(0, arr.length - 1).every(
+                            (n) => row[n] !== row[n + 1]
+                        );
+                    });
+                return f(matrix) && f(R.transpose(matrix));
+            };
+            function isGameClear() {
+                //const table = { 3: 7, 4: 10, 5: 12, 6: 13 };
+                //短縮版
+                const table = { 3: 4, 4: 5, 5: 6, 6: 7 };
+                const c = table[props.cellNum];
+                return panels.value.map(elm => elm.num).includes(c)
+            }
+
+        })
 
         function dist(vec) {
             return dir.y === 1
@@ -177,13 +243,46 @@ onMounted(() => {
     })
 })
 
+const restart = () => {
+
+    gameOver.value = false;
+    gameClear.value = false;
+    afterClear.value = false;
+    score.value = 0;
+    panels.value = [];
+    transition.value = false;
+    highScore.value = getHighScore(props.cellNum)
+    putPanel();
+    putPanel();
+}
+
+const conti = () => {
+    gameClear.value = false;
+    afterClear.value = true;
+}
+
 </script>
 <template>
     <div class="field">
+        <GameOver :score="score" @on-click="restart" v-if="gameOver"></GameOver>
+        <GameClear :score="score" v-if="gameClear" @on-click-restart="restart" @on-click-conti="conti"></GameClear>
+
+        <div class="scores">
+            <div class="hiscore">
+                <p>ハイスコア</p>
+                <p class="highScore">{{ highScore }}</p>
+            </div>
+            <div class="score">
+                <p>スコア</p>
+                <p class="score">{{ score }}</p>
+            </div>
+        </div>
         <div class="cell" v-for="_ of cellNumTotal" :style="cellStyle"></div>
-        <div class="panel" v-for="panel of panels" :style="panelStyle(panel)">
+        <div class="panel" v-for="panel of panels" :style="panelStyle(panel)"
+            :class="{ transition: transition, inAnimation: panel.inAnimation }">
             {{ 2 ** (panel.num + 1) }}
         </div>
+        <button class="restart" @click="restart">リスタート</button>
     </div>
 </template>
 
@@ -209,6 +308,52 @@ onMounted(() => {
     display: grid;
     place-content: center;
     position: absolute;
+    /* transition: 0.3s; */
+}
+
+.transition {
     transition: 0.3s;
+}
+
+.inAnimation {
+    animation: 0.3s pop;
+}
+
+@keyframes pop {
+    from {
+        scale: 0
+    }
+
+    50% {
+        scale: 1.2
+    }
+
+    to {
+        scale: 1
+    }
+}
+
+div.scores {
+    position: absolute;
+    display: flex;
+    padding: 20px 0;
+    gap: 10px;
+    top: -100px;
+    right: 0px;
+}
+
+div.highScore,
+div.score {
+    width: 120px;
+    height: 60px;
+    background-color: darkgreen;
+    color: white;
+    border-radius: 10px;
+    display: grid;
+    place-content: center;
+}
+
+div.scores p {
+    text-align: center;
 }
 </style>
