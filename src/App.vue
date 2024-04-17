@@ -10,7 +10,7 @@ const startView = ref(true);
 const showingRule = ref(false);
 const cellNum = ref(4);
 
-const startGame = (size: number) => {
+const startGame = (size) => {
   cellNum.value = size;
   startView.value = false;
 }
