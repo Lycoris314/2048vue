@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import { ref } from "vue"
 import TheStart from './components/TheStart.vue'
 import TheGame from "./components/TheGame.vue"
@@ -10,7 +10,7 @@ const startView = ref(true);
 const showingRule = ref(false);
 const cellNum = ref(4);
 
-const startGame = (size) => {
+const startGame = (size: number) => {
   cellNum.value = size;
   startView.value = false;
 }
