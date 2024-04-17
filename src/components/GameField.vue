@@ -1,6 +1,6 @@
 <script setup>
 import { ref, computed, onMounted } from "vue"
-import { YX, yx } from "./class/YX.ts"
+import { YX, yx } from "./class/YX.js"
 import { Panel } from "./class/panel.ts"
 import { randomNum, emptyCells, randomSelect } from "./forPutPannel.ts"
 import GameOver from "./GameOver.vue"

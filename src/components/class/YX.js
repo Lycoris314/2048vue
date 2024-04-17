@@ -1,8 +1,8 @@
 export class YX {
-    y: number;
-    x: number;
+    y;
+    x;
 
-    constructor(y: number, x: number) {
+    constructor(y, x) {
         this.y = y;
         this.x = x;
     }
@@ -14,14 +14,14 @@ export class YX {
     //     return this.#x;
     // }
 
-    static add(v: YX, w: YX) {
+    static add(v, w) {
         return yx(v.y + w.y, v.x + w.x);
     }
-    static scalar(a: number, v: YX) {
+    static scalar(a, v) {
         return yx(a * v.y, a * v.x);
     }
 }
 
-export function yx(y: number, x: number) {
+export function yx(y, x) {
     return new YX(y, x);
 }

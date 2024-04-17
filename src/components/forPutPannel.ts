@@ -1,6 +1,6 @@
 //putPanel関数を構成する関数たち
 
-import { YX, yx } from "./class/YX.ts";
+import { yx } from "./class/YX.js";
 
 export const randomNum = (cellNum: number) => {
     const index = (r: number, arr: number[]) => arr.findIndex((elm) => r < elm);
