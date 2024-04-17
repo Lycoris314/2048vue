@@ -1,4 +1,4 @@
-<script setup lang="ts">
+<script setup>
 import GameField from "./GameField.vue";
 import H1 from "./H1.vue";
 
