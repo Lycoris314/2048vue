@@ -16,9 +16,9 @@ const props = defineProps({ cellNum: Number, showingRule: Boolean })
 const score = ref(0);
 const highScore = ref(getHighScore(props.cellNum));
 
-const gameOver = ref(false);
-const gameClear = ref(false);
-const afterClear = ref(false); //クリア後にはもうクリア画面が表示されないようにするための
+const gameOver = ref(false); //ゲームーバー画面の表示
+const gameClear = ref(false); //ゲームクリア画面の表示
+const afterClear = ref(false); //クリア後にはもうクリア画面が表示されないようにするのに使う
 
 const panels = ref([]);
 
@@ -81,18 +81,19 @@ onMounted(() => {
         let moving = [];
 
         panels.value.forEach(elm => {
-
+            //dCAC[0]は自身が衝突して消えるときにtrue。
+            //dCAC[1]は移動方向で消失するパネルの数(自身が消えるならそれもカウント)
             const dCAC = disapCondAndCount(nRPtoNum(elm.vec), elm.num)
-
+            //移動距離
             const moveLength = dist(elm.vec) - nRPtoNum(elm.vec).length + dCAC[1];
-
+            //自身が消える場合にgrowするパネルの位置を記録
             if (dCAC[0]) {
                 growPanels.push(YX.add(elm.vec, YX.scalar(moveLength, dir)))
-
+                //消えない場合は次の世代へ
             } else {
                 nextGenePanels.push(elm)
             }
-
+            //移動アニメーションのため移動距離を記録しておく
             moving.push([elm, moveLength]);
         })
         //１つも移動しないならここで中断(パネルは追加しない)
@@ -115,6 +116,7 @@ onMounted(() => {
 
             panels.value = nextGenePanels
 
+            //衝突されたパネルをgrowさせる。
             growPanels.forEach((elm) => {
                 const panel = panels.value.find(pa => {
                     return pa.vec.y === elm.y && pa.vec.x === elm.x;
@@ -128,43 +130,22 @@ onMounted(() => {
 
             putPanel();
 
-            //ゲームクリア
+            //ゲームクリアの時
             if (isGameClear() && !afterClear.value) {
                 console.log("clear");
                 gameClear.value = true;
                 updateHighScore(props.cellNum, score.value);
 
             }
-            //ゲームオーバー
+            //ゲームオーバーの時
             else if (isGameOver()) {
                 gameOver.value = true;
                 updateHighScore(props.cellNum, score.value);
             }
         })
 
-        function isGameClear() {
-            //const table = { 3: 7, 4: 10, 5: 12, 6: 13 };
-            //短縮版
-            const table = { 3: 4, 4: 5, 5: 6, 6: 7 };
-            const c = table[props.cellNum];
-            return panels.value.map(elm => elm.num).includes(c)
-        }
 
-        function isGameOver() {
-            return panels.value.length === props.cellNum ** 2
-                && noMove(position.value)
-        }
-        function noMove(matrix) {
-            const f = (mat) =>
-                mat.every((arr) => {
-                    const row = arr.map((elm) => elm.num);
-                    return R.range(0, arr.length - 1).every(
-                        (n) => row[n] !== row[n + 1]
-                    );
-                });
-            return f(matrix) && f(R.transpose(matrix));
-        };
-
+        //移動方向に向かってフィールド境界までの距離
         function dist(vec) {
             return dir.y === 1
                 ? props.cellNum - vec.y - 1
@@ -176,7 +157,7 @@ onMounted(() => {
                             ? vec.x
                             : null;
         }
-
+        //境界までのパネルの列(null="空"も含む)
         function path(vec) {
             const re = R.range(1, dist(vec) + 1).map(i => {
                 const w = YX.add(vec, YX.scalar(i, dir));
@@ -184,14 +165,18 @@ onMounted(() => {
             })
             return re;
         }
-
+        //pathからnullを取り除く
         function nullRemovedPath(vec) {
             return path(vec).filter(elm => elm !== null)
         }
+        //パネルのnumの列に変換
         function nRPtoNum(vec) {
             return nullRemovedPath(vec).map(elm => elm.num)
         }
-
+        //自身のnumがn,nRPtoNumがarrであるときに自身が消失するかどうかと、
+        //さらに移動方向に向かってパネルが消失する数を返す。
+        //例([1,1,2,2],1)=>[false,2]
+        //([1,2,0],1)=>[true,1]
         function disapCondAndCount(arr, n) {
             let count = 0;
             const disapCond = (arr, n) => {
@@ -219,6 +204,28 @@ onMounted(() => {
     })
 })
 
+function isGameClear() {
+    //const table = { 3: 7, 4: 10, 5: 12, 6: 13 };
+    //短縮版
+    const table = { 3: 4, 4: 5, 5: 6, 6: 7 };
+    const c = table[props.cellNum];
+    return panels.value.map(elm => elm.num).includes(c)
+}
+
+function isGameOver() {
+    return panels.value.length === props.cellNum ** 2
+        && noMove(position.value)
+}
+function noMove(matrix) {
+    const f = (mat) =>
+        mat.every((arr) => {
+            const row = arr.map((elm) => elm.num);
+            return R.range(0, arr.length - 1).every(
+                (n) => row[n] !== row[n + 1]
+            );
+        });
+    return f(matrix) && f(R.transpose(matrix));
+};
 
 //リスタートボタンを押すと
 const restart = () => {
