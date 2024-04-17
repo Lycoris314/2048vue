@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import { ref, computed, onMounted } from "vue"
 import { YX, yx } from "./class/YX.ts"
 import { Panel } from "./class/panel.ts"
