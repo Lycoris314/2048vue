@@ -1,8 +1,11 @@
-<script setup></script>
+<script setup>
+const emit = defineEmits(["on-click"]);
+
+</script>
 
 <template>
-    <div class="back">
-        <div class="content">
+    <div class="back" @click="emit('on-click')">
+        <div class="content" @click.stop="">
             <h2>ルール</h2>
             <p>同じ数字のパネルを合体させて数字を大きくしよう</p>
             <p>目指せ 2048! (サイズ4×4の場合)</p>
@@ -63,6 +66,7 @@ h2 {
 
 p {
     line-height: 2;
+    font-family: sans-serif;
 }
 
 p.under {

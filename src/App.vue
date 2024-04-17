@@ -26,13 +26,13 @@ const toggleRule = () => {
 </script>
 
 <template>
-
+  <!-- スタート画面 -->
   <TheStart v-if="startView" @on-click="startGame"></TheStart>
-
+  <!-- ゲーム画面 -->
   <TheGame v-else @on-click="backToStart" :cellNum="cellNum" :showingRule="showingRule"></TheGame>
 
   <RuleBtn @on-click="toggleRule"></RuleBtn>
-  <RuleView :class="{ show: showingRule }"></RuleView>
+  <RuleView :class="{ show: showingRule }" @on-click="toggleRule"></RuleView>
 
 </template>
 

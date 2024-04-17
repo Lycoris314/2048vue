@@ -5,6 +5,9 @@ import { Panel } from "./class/panel.ts"
 import { randomNum, emptyCells, randomSelect } from "./forPutPannel.ts"
 import GameOver from "./GameOver.vue"
 import GameClear from "./GameClear.vue"
+import Scores from "./Scores.vue"
+import Cells from "./Cells.vue"
+import Panels from "./Panels.vue"
 import { getHighScore, updateHighScore } from "./highScore.ts"
 
 
@@ -17,13 +20,7 @@ const gameOver = ref(false);
 const gameClear = ref(false);
 const afterClear = ref(false); //クリア後にはもうクリア画面が表示されないようにするための
 
-const cellSize = computed(() => (690 - (props.cellNum - 1) * 10) / props.cellNum)
-const cellNumTotal = computed(() => R.range(0, props.cellNum ** 2))
-
-const cellStyle = {
-    width: `${cellSize.value}px`,
-    height: `${cellSize.value}px`
-}
+// const cellSize = computed(() => (690 - (props.cellNum - 1) * 10) / props.cellNum)
 
 const panels = ref([]);
 
@@ -47,15 +44,15 @@ const putPanel = () => {
     panels.value.push(panel);
 }
 
-const panelStyle = (panel) => {
-    return {
-        width: `${cellSize.value}px`,
-        height: `${cellSize.value}px`,
-        top: `${panel.vec.y * (cellSize.value + 10) + 10}px`,
-        left: `${panel.vec.x * (cellSize.value + 10) + 10}px`,
-        backgroundColor: Panel.COLORS[panel.num]
-    }
-}
+// const panelStyle = (panel) => {
+//     return {
+//         width: `${cellSize.value}px`,
+//         height: `${cellSize.value}px`,
+//         top: `${panel.vec.y * (cellSize.value + 10) + 10}px`,
+//         left: `${panel.vec.x * (cellSize.value + 10) + 10}px`,
+//         backgroundColor: Panel.COLORS[panel.num]
+//     }
+// }
 
 putPanel();
 putPanel();
@@ -230,7 +227,7 @@ onMounted(() => {
         };
     })
 })
-
+//リスタートボタンを押す
 const restart = () => {
 
     gameOver.value = false;
@@ -243,7 +240,7 @@ const restart = () => {
     putPanel();
     putPanel();
 }
-
+//そのまま続けるボタンを押す
 const conti = () => {
     gameClear.value = false;
     afterClear.value = true;
@@ -255,26 +252,22 @@ const conti = () => {
         <GameOver :score="score" @on-click="restart" v-if="gameOver"></GameOver>
         <GameClear :score="score" v-if="gameClear" @on-click-restart="restart" @on-click-conti="conti"></GameClear>
 
-        <div class="scores">
-            <div class="highScore">
-                <p>ハイスコア</p>
-                <p class="highScore">{{ highScore }}</p>
-            </div>
-            <div class="score">
-                <p>スコア</p>
-                <p class="score">{{ score }}</p>
-            </div>
-        </div>
+        <Scores>
+            <template #highScore>{{ highScore }}</template>
+            <template #score>{{ score }}</template>
+        </Scores>
 
-        <div class="cell" v-for="_ of cellNumTotal" :style="cellStyle"></div>
+        <Cells :cellNum="props.cellNum"></Cells>
 
-        <div class="panel" v-for="panel of panels" :style="panelStyle(panel)" :class="{
+        <!-- <div class="panel" v-for="panel of panels" :style="panelStyle(panel)" :class="{
             transition: transition,
             popAnimation: panel.popAnimation,
             growAnimation: panel.growAnimation
         }">
             {{ 2 ** (panel.num + 1) }}
-        </div>
+        </div> -->
+        <Panels :panels="panels" :transition="transition" :cellNum="props.cellNum">
+        </Panels>
 
         <button class="restart" @click="restart">リスタート</button>
     </div>
@@ -294,11 +287,7 @@ const conti = () => {
     position: relative;
 }
 
-.cell {
-    background-color: darkgreen;
-}
-
-.panel {
+/* .panel {
     background-color: gray;
     display: grid;
     font-size: 1.5rem;
@@ -340,31 +329,7 @@ const conti = () => {
     to {
         scale: 1;
     }
-}
-
-div.scores {
-    position: absolute;
-    display: flex;
-    padding: 20px 0;
-    gap: 10px;
-    top: -100px;
-    right: 0px;
-}
-
-div.highScore,
-div.score {
-    width: 120px;
-    height: 60px;
-    background-color: darkgreen;
-    color: white;
-    border-radius: 10px;
-    display: grid;
-    place-content: center;
-}
-
-div.scores p {
-    text-align: center;
-}
+} */
 
 button.restart {
     width: 70%;
