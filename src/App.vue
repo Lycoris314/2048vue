@@ -1,4 +1,4 @@
-<script setup lang="ts">
+<script setup>
 import { ref } from "vue"
 import TheStart from './components/TheStart.vue'
 import TheGame from "./components/TheGame.vue"
