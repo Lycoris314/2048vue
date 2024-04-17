@@ -1,6 +1,6 @@
 <script setup>
 import { ref, computed, onMounted } from "vue"
-import { YX, yx } from "./class/YX.js"
+import { YX, yx } from "./class/YX.ts"
 import { Panel } from "./class/panel.ts"
 import { randomNum, emptyCells, randomSelect } from "./forPutPannel.ts"
 import GameOver from "./GameOver.vue"
@@ -294,4 +294,4 @@ button.restart {
 button.restart:hover {
     background-color: rgb(222, 255, 222);
 }
-</style>
+</style>./class/YX.js
