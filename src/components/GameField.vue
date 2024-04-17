@@ -20,8 +20,6 @@ const gameOver = ref(false);
 const gameClear = ref(false);
 const afterClear = ref(false); //クリア後にはもうクリア画面が表示されないようにするための
 
-// const cellSize = computed(() => (690 - (props.cellNum - 1) * 10) / props.cellNum)
-
 const panels = ref([]);
 
 const position = computed(() => {
@@ -43,16 +41,6 @@ const putPanel = () => {
 
     panels.value.push(panel);
 }
-
-// const panelStyle = (panel) => {
-//     return {
-//         width: `${cellSize.value}px`,
-//         height: `${cellSize.value}px`,
-//         top: `${panel.vec.y * (cellSize.value + 10) + 10}px`,
-//         left: `${panel.vec.x * (cellSize.value + 10) + 10}px`,
-//         backgroundColor: Panel.COLORS[panel.num]
-//     }
-// }
 
 putPanel();
 putPanel();
@@ -134,7 +122,7 @@ onMounted(() => {
                 //if (panel === undefined) console.log("grow panel not found");
 
                 panel.grow();
-
+                //得点加算
                 score.value += 2 ** (panel.num + 1)
             })
 
@@ -148,31 +136,34 @@ onMounted(() => {
 
             }
             //ゲームオーバー
-            else if (panels.value.length === props.cellNum ** 2
-                && noMove(position.value)
-            ) {
+            else if (isGameOver()) {
                 gameOver.value = true;
                 updateHighScore(props.cellNum, score.value);
             }
-            function noMove(matrix) {
-                const f = (mat) =>
-                    mat.every((arr) => {
-                        const row = arr.map((elm) => elm.num);
-                        return R.range(0, arr.length - 1).every(
-                            (n) => row[n] !== row[n + 1]
-                        );
-                    });
-                return f(matrix) && f(R.transpose(matrix));
-            };
-            function isGameClear() {
-                //const table = { 3: 7, 4: 10, 5: 12, 6: 13 };
-                //短縮版
-                const table = { 3: 4, 4: 5, 5: 6, 6: 7 };
-                const c = table[props.cellNum];
-                return panels.value.map(elm => elm.num).includes(c)
-            }
-
         })
+
+        function isGameClear() {
+            //const table = { 3: 7, 4: 10, 5: 12, 6: 13 };
+            //短縮版
+            const table = { 3: 4, 4: 5, 5: 6, 6: 7 };
+            const c = table[props.cellNum];
+            return panels.value.map(elm => elm.num).includes(c)
+        }
+
+        function isGameOver() {
+            return panels.value.length === props.cellNum ** 2
+                && noMove(position.value)
+        }
+        function noMove(matrix) {
+            const f = (mat) =>
+                mat.every((arr) => {
+                    const row = arr.map((elm) => elm.num);
+                    return R.range(0, arr.length - 1).every(
+                        (n) => row[n] !== row[n + 1]
+                    );
+                });
+            return f(matrix) && f(R.transpose(matrix));
+        };
 
         function dist(vec) {
             return dir.y === 1
@@ -227,7 +218,9 @@ onMounted(() => {
         };
     })
 })
-//リスタートボタンを押す
+
+
+//リスタートボタンを押すと
 const restart = () => {
 
     gameOver.value = false;
@@ -240,10 +233,14 @@ const restart = () => {
     putPanel();
     putPanel();
 }
-//そのまま続けるボタンを押す
+//そのまま続けるボタンを押すと
 const conti = () => {
     gameClear.value = false;
     afterClear.value = true;
+    //クリア後即ゲームオーバー
+    if (isGameOver()) {
+        gameOver.value = true;
+    }
 }
 
 </script>
@@ -259,13 +256,6 @@ const conti = () => {
 
         <Cells :cellNum="props.cellNum"></Cells>
 
-        <!-- <div class="panel" v-for="panel of panels" :style="panelStyle(panel)" :class="{
-            transition: transition,
-            popAnimation: panel.popAnimation,
-            growAnimation: panel.growAnimation
-        }">
-            {{ 2 ** (panel.num + 1) }}
-        </div> -->
         <Panels :panels="panels" :transition="transition" :cellNum="props.cellNum">
         </Panels>
 
@@ -286,50 +276,6 @@ const conti = () => {
     flex-wrap: wrap;
     position: relative;
 }
-
-/* .panel {
-    background-color: gray;
-    display: grid;
-    font-size: 1.5rem;
-    place-content: center;
-    position: absolute;
-}
-
-.transition {
-    transition: 0.3s;
-}
-
-.popAnimation {
-    animation: 0.3s pop;
-}
-
-@keyframes pop {
-    from {
-        scale: 0
-    }
-
-    to {
-        scale: 1
-    }
-}
-
-.growAnimation {
-    animation: 0.3s grow;
-}
-
-@keyframes grow {
-    from {
-        scale: 1;
-    }
-
-    50% {
-        scale: 1.2;
-    }
-
-    to {
-        scale: 1;
-    }
-} */
 
 button.restart {
     width: 70%;
