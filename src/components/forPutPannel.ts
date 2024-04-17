@@ -1,3 +1,5 @@
+//putPanel関数を構成する関数たち
+
 import { YX, yx } from "./class/YX.ts";
 
 export const randomNum = (cellNum: number) => {

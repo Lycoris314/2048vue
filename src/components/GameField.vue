@@ -78,22 +78,25 @@ onMounted(() => {
 
         let nextGenePanels = [];//衝突しない(消えない)パネルを入れていく
         let growPanels = [];//衝突されてgrowするパネルの位置を入れていく
-        let moving = [];
+        let moving = [];//各パネルの移動距離を記録
 
         panels.value.forEach(elm => {
-            //dCAC[0]は自身が衝突して消えるときにtrue。
-            //dCAC[1]は移動方向で消失するパネルの数(自身が消えるならそれもカウント)
-            const dCAC = disapCondAndCount(nRPtoNum(elm.vec), elm.num)
+
+            const arr = toNum(path(elm.vec));
+
+            //自身が消失するかどうか、さらに移動方向に向かってパネルが消失する数を返す(自身が消失するならそれも含む)。
+            const i = info(elm.num, arr)
+
             //移動距離
-            const moveLength = dist(elm.vec) - nRPtoNum(elm.vec).length + dCAC[1];
+            const moveLength = dist(elm.vec) - arr.length + i.disapCount;
             //自身が消える場合にgrowするパネルの位置を記録
-            if (dCAC[0]) {
+            if (i.isDisap) {
                 growPanels.push(YX.add(elm.vec, YX.scalar(moveLength, dir)))
                 //消えない場合は次の世代へ
             } else {
                 nextGenePanels.push(elm)
             }
-            //移動アニメーションのため移動距離を記録しておく
+
             moving.push([elm, moveLength]);
         })
         //１つも移動しないならここで中断(パネルは追加しない)
@@ -121,8 +124,6 @@ onMounted(() => {
                 const panel = panels.value.find(pa => {
                     return pa.vec.y === elm.y && pa.vec.x === elm.x;
                 })
-                //if (panel === undefined) console.log("grow panel not found");
-
                 panel.grow();
                 //得点加算
                 score.value += 2 ** (panel.num + 1)
@@ -132,7 +133,6 @@ onMounted(() => {
 
             //ゲームクリアの時
             if (isGameClear() && !afterClear.value) {
-                console.log("clear");
                 gameClear.value = true;
                 updateHighScore(props.cellNum, score.value);
 
@@ -165,21 +165,17 @@ onMounted(() => {
             })
             return re;
         }
-        //pathからnullを取り除く
-        function nullRemovedPath(vec) {
-            return path(vec).filter(elm => elm !== null)
+        //pathからnullを取り除いた後、panel.numの列に変換
+        function toNum(path) {
+            return path.filter(elm => elm !== null)
+                .map(elm => elm.num)
         }
-        //パネルのnumの列に変換
-        function nRPtoNum(vec) {
-            return nullRemovedPath(vec).map(elm => elm.num)
-        }
-        //自身のnumがn,nRPtoNumがarrであるときに自身が消失するかどうかと、
-        //さらに移動方向に向かってパネルが消失する数を返す。
-        //例([1,1,2,2],1)=>[false,2]
-        //([1,2,0],1)=>[true,1]
-        function disapCondAndCount(arr, n) {
+
+        //例 info(1,[1,2,2])=>{true,2}
+        //info(1,[1,1,2,2,1]=>{false,2})
+        function info(n, arr) {
             let count = 0;
-            const disapCond = (arr, n) => {
+            const isDisap = (n, arr) => {
                 //基底部
                 if (arr.length === 0) return false;
 
@@ -194,12 +190,12 @@ onMounted(() => {
                 //再帰部
                 if (arr.at(-1) === arr.at(-2)) {
                     count++;
-                    return disapCond(arr.slice(0, -2), n);
+                    return isDisap(n, arr.slice(0, -2));
                 } else {
-                    return disapCond(arr.slice(0, -1), n);
+                    return isDisap(n, arr.slice(0, -1));
                 }
             };
-            return [disapCond(arr, n), count];
+            return { isDisap: isDisap(n, arr), disapCount: count };
         };
     })
 })

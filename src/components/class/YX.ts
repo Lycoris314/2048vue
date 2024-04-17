@@ -6,6 +6,13 @@ export class YX {
         this.y = y;
         this.x = x;
     }
+    //getが使えない？
+    // get y() {
+    //     return this.#y;
+    // }
+    // get x() {
+    //     return this.#x;
+    // }
 
     static add(v: YX, w: YX) {
         return yx(v.y + w.y, v.x + w.x);
