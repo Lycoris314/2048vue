@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref } from "vue";
-//import { emit } from "process";
 import H1 from "./H1.vue";
+import { getHighScore } from "./highScore.ts";
 
 const checkBoxNum = ref(4);
 
@@ -16,47 +16,30 @@ const gameStart = () => {
 <template>
     <div class="container">
         <H1></H1>
-        {{ checkBoxNum }}
+
         <h2>サイズを選択</h2>
         <ul>
-            <li><label for="33">3×3</label> <input type="radio" name="size" id="33" value="3" v-model="checkBoxNum">
-            </li>
-            <li><label for="44">4×4</label> <input type="radio" name="size" id="44" value="4" v-model="checkBoxNum"
-                    checked></li>
-            <li><label for="55">5×5</label> <input type="radio" name="size" id="55" value="5" v-model="checkBoxNum">
-            </li>
-            <li><label for="66">6×6</label> <input type="radio" name="size" id="66" value="6" v-model="checkBoxNum">
+            <li v-for="i of ['3', '4', '5', '6']">
+                <label :for=i>{{ i }}×{{ i }} </label> &ensp;
+                <input type="radio" name="size" :id=i :value=i v-model="checkBoxNum">
             </li>
         </ul>
+
         <button class=" gameStart" @click="gameStart">スタート</button>
 
         <h2>ハイスコア</h2>
         <table>
-            <tr>
-                <td>3×3</td>
-                <td></td>
-            </tr>
-            <tr>
-                <td>4×4</td>
-                <td></td>
-            </tr>
-            <tr>
-                <td>5×5</td>
-                <td></td>
-            </tr>
-            <tr>
-                <td>6×6</td>
-                <td></td>
+            <tr v-for="  i   of   [3, 4, 5, 6]">
+                <td>{{ i }}×{{ i }}</td>
+                <td>{{ getHighScore(i) }}点</td>
             </tr>
         </table>
-
-
     </div>
 </template>
 
 <style scoped>
 .container {
-    height: 100vh;
+    min-height: 100vh;
     width: 800px;
     margin: 0 auto;
     padding: 0 30px;
@@ -64,17 +47,70 @@ const gameStart = () => {
     background-color: antiquewhite;
 }
 
-ul {
-    list-style-type: none;
-    padding: 0;
+li {
+    font-size: 1.2rem;
+    padding: 3px 0;
 }
 
-.gameStart {
+ul {
+    list-style-type: none;
+    padding: 20px;
+}
+
+input[type="radio"] {
+    scale: 1.7
+}
+
+input[type="radio"]:hover {
+    cursor: pointer;
+}
+
+
+button.gameStart {
+    display: block;
     width: 70%;
     height: 40px;
     background-color: white;
     border: 2px solid darkgreen;
     border-radius: 20px;
+    margin: 40px auto;
+    transition: 0.3s;
+}
 
+button.gameStart:hover {
+    background-color: rgb(226, 255, 179);
+}
+
+button.gameStart:active {
+    background-color: rgb(192, 216, 152);
+}
+
+table {
+
+    border-collapse: collapse;
+    margin: 50px auto 0;
+}
+
+/* スクロール時の余白のため */
+table::after {
+    content: "";
+    display: block;
+    width: 100%;
+    height: 20px;
+}
+
+td {
+    width: 200px;
+    text-align: center;
+    font-size: 1.2rem;
+    padding: 4px 0;
+}
+
+tr:nth-child(even) {
+    background-color: rgb(161, 255, 224);
+}
+
+tr:nth-child(odd) {
+    background-color: rgb(255, 220, 165);
 }
 </style>

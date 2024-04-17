@@ -1,9 +1,10 @@
-import { YX, yx } from "./YX.js";
+import { YX, yx } from "./YX.ts";
 
 export class Panel {
     vec: YX;
     num: number;
-    inAnimation: boolean;
+    popAnimation: boolean;
+    growAnimation: boolean;
 
     static COLORS = [
         "silver", //num=0
@@ -26,10 +27,13 @@ export class Panel {
     constructor(vec: YX, num: number) {
         this.vec = vec;
         this.num = num;
-        this.inAnimation = true;
+
+        this.popAnimation = true;
         setTimeout(() => {
-            this.inAnimation = false;
-        }, 500);
+            this.popAnimation = false;
+        }, 300);
+
+        this.growAnimation = false;
     }
 
     // get vec() {
@@ -42,6 +46,10 @@ export class Panel {
 
     grow() {
         this.num++;
+        this.growAnimation = true;
+        setTimeout(() => {
+            this.growAnimation = false;
+        }, 300);
     }
 
     slide(vec: YX) {

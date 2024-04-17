@@ -7,19 +7,19 @@ const emit = defineEmits(["on-click"]);
 const toStart = () => {
     emit("on-click")
 }
-const props = defineProps({ cellNum: Number })
+const props = defineProps({ cellNum: Number, showingRule: Boolean })
 </script>
 <template>
     <div class="container">
         <H1></H1>
-        <GameField :cellNum="props.cellNum"></GameField>
+        <GameField :cellNum="props.cellNum" :showingRule="props.showingRule"></GameField>
         <button class="toStart" @click="toStart">スタート<br>画面に戻る</button>
     </div>
 
 </template>
 <style scoped>
 .container {
-    height: 100vh;
+    height: max(100vh, 970px);
     width: 800px;
     margin: 0 auto;
     padding: 0 30px;
@@ -33,9 +33,13 @@ button.toStart {
     font-size: 0.75rem;
     border-radius: 20px 20px 0 0;
     padding: 5px 20px;
-    position: absolute;
+    position: fixed;
     bottom: 0;
     right: calc(50% - 220px);
     z-index: 60;
+}
+
+button.toStart:hover {
+    background-color: green;
 }
 </style>

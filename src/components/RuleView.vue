@@ -2,14 +2,40 @@
 
 <template>
     <div class="back">
-
+        <div class="content">
+            <h2>ルール</h2>
+            <p>同じ数字のパネルを合体させて数字を大きくしよう</p>
+            <p>目指せ 2048! (サイズ4×4の場合)</p>
+            <hr />
+            <h2>操作方法</h2>
+            <p>※キーボード操作のみ受け付けます。</p>
+            <p class="under">上下左右キー(またはWSADキー)</p>
+            <p>
+                同じパネルが重なると合体して数値が２倍となり、合体した値がスコアに加算されます。クリア後もパネルを動かせなくなるまで続けることができます。
+            </p>
+            <hr />
+            <h2>クリア条件</h2>
+            <p>サイズ3×3：256のパネルをつくる</p>
+            <p>サイズ4×4：2048のパネルをつくる</p>
+            <p>サイズ5×5：8192のパネルをつくる</p>
+            <p>サイズ6×6：16384のパネルをつくる</p>
+            <hr />
+            <h2>パネルの出現率</h2>
+            <p>サイズ3×3：2 (90%) 4 (10%)</p>
+            <p>サイズ4×4：2 (90%) 4 (10%)</p>
+            <p>サイズ5×5：2 (40%) 4 (30%) 8 (20%) 16 (10%)</p>
+            <p>
+                サイズ6×6：2 (30%) 4 (20%) 8 (20%) 16 (10%) 32 (10%) 64
+                (10%)
+            </p>
+        </div>
     </div>
 </template>
 
 <style scoped>
 .back {
     width: 100%;
-    height: 100vw;
+    height: 100vh;
     position: fixed;
     top: 100%;
     left: 0;
@@ -20,5 +46,26 @@
 
 .back.show {
     top: 0
+}
+
+.content {
+    background-color: white;
+    width: 80%;
+    height: calc(100vh - 60px);
+    margin: 30px auto;
+    padding: 15px;
+    overflow-y: scroll;
+}
+
+h2 {
+    padding: 10px 0;
+}
+
+p {
+    line-height: 2;
+}
+
+p.under {
+    text-decoration: underline;
 }
 </style>

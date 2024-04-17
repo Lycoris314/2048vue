@@ -1,0 +1,19 @@
+@import url("https://fonts.googleapis.com/css2?family=Stick&display=swap");
+
+* {
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: "Stick", sans-serif;
+}
+
+button {
+    cursor: pointer;
+    transition: 0.3s;
+    font-family: "Stick", sans-serif;
+}
+
+#app {
+}

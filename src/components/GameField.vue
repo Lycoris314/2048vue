@@ -1,6 +1,6 @@
 <script setup>
 import { ref, computed, onMounted } from "vue"
-import { YX, yx } from "./class/YX.js"
+import { YX, yx } from "./class/YX.ts"
 import { Panel } from "./class/panel.ts"
 import { randomNum, emptyCells, randomSelect } from "./forPutPannel.ts"
 import GameOver from "./GameOver.vue"
@@ -8,14 +8,14 @@ import GameClear from "./GameClear.vue"
 import { getHighScore, updateHighScore } from "./highScore.ts"
 
 
-const props = defineProps({ cellNum: Number })
+const props = defineProps({ cellNum: Number, showingRule: Boolean })
 
 const score = ref(0);
 const highScore = ref(getHighScore(props.cellNum));
 
 const gameOver = ref(false);
 const gameClear = ref(false);
-const afterClear = ref(false);
+const afterClear = ref(false); //クリア後にはもうクリア画面が表示されないようにするための
 
 const cellSize = computed(() => (690 - (props.cellNum - 1) * 10) / props.cellNum)
 const cellNumTotal = computed(() => R.range(0, props.cellNum ** 2))
@@ -28,19 +28,17 @@ const cellStyle = {
 const panels = ref([]);
 
 const position = computed(() => {
-
+    //初期化
     const num = props.cellNum;
-
     const mat = new Array(num).fill(null).map(_ => new Array(num).fill(null));
 
     panels.value.forEach(elm => {
         mat[elm.vec.y][elm.vec.x] = elm;
     })
-
     return mat;
 })
 
-const transition = ref(false);
+const transition = ref(false); //移動アニメーション中にtrue
 
 const putPanel = () => {
     const vec = randomSelect(emptyCells(position.value))
@@ -61,7 +59,6 @@ const panelStyle = (panel) => {
 
 putPanel();
 putPanel();
-putPanel();
 
 onMounted(() => {
 
@@ -69,6 +66,9 @@ onMounted(() => {
     html.addEventListener("keydown", (e) => {
 
         if (transition.value) return;
+        if (props.showingRule) return;
+        if (gameOver.value) return;
+        if (gameClear.value) return;
 
         function dir_(key) {
             switch (key) {
@@ -91,42 +91,31 @@ onMounted(() => {
         const dir = dir_(e.key)
         if (dir === null) return;
 
-        let nextGenePanels = [];
-        let growPanels = [];
+        let nextGenePanels = [];//衝突しない(消えない)パネルを入れていく
+        let growPanels = [];//衝突されてgrowするパネルの位置を入れていく
         let moving = [];
 
         panels.value.forEach(elm => {
 
-            //console.log("開始位置", elm.vec);
-
             const dCAC = disapCondAndCount(nRPtoNum(elm.vec), elm.num)
 
-            // console.log("壁までの距離", dist(elm.vec));
-            // console.log("間のパネル数", nRPtoNum(elm.vec).length);
-            // console.log("間の消失パネル数", dCAC[1]);
-
-
             const moveLength = dist(elm.vec) - nRPtoNum(elm.vec).length + dCAC[1];
-            //console.log("移動距離", moveLength);
 
             if (dCAC[0]) {
-                //console.log("消失");
                 growPanels.push(YX.add(elm.vec, YX.scalar(moveLength, dir)))
 
-
             } else {
-                //console.log("消えず");
-
-                nextGenePanels.push([elm, YX.scalar(moveLength, dir)])
+                nextGenePanels.push(elm)
             }
 
             moving.push([elm, moveLength]);
         })
-
+        //１つも移動しないならここで中断(パネルは追加しない)
         if (moving.every(elm => elm[1] === 0)) return;
 
-        //panels.value = nextGenePanels;
+        //以下移動アニメーション用
         transition.value = true;
+
         moving.forEach(elm => {
             elm[0].slide(YX.scalar(elm[1], dir));
         })
@@ -136,27 +125,26 @@ onMounted(() => {
                 resolve();
             }, 300)
         }).then(() => {
+            //移動アニメーション終わり
             transition.value = false;
 
-            panels.value = [];
-            nextGenePanels.forEach(elm => {
-                //elm[0].slide(elm[1])
-                panels.value.push(elm[0]);
-            })
-            nextGenePanels = [];
+            panels.value = nextGenePanels
 
             growPanels.forEach((elm) => {
                 const panel = panels.value.find(pa => {
                     return pa.vec.y === elm.y && pa.vec.x === elm.x;
                 })
+                //if (panel === undefined) console.log("grow panel not found");
+
                 panel.grow();
+
                 score.value += 2 ** (panel.num + 1)
             })
 
             putPanel();
 
             //ゲームクリア
-            if (isGameClear() && afterClear.value) {
+            if (isGameClear() && !afterClear.value) {
                 console.log("clear");
                 gameClear.value = true;
                 updateHighScore(props.cellNum, score.value);
@@ -268,7 +256,7 @@ const conti = () => {
         <GameClear :score="score" v-if="gameClear" @on-click-restart="restart" @on-click-conti="conti"></GameClear>
 
         <div class="scores">
-            <div class="hiscore">
+            <div class="highScore">
                 <p>ハイスコア</p>
                 <p class="highScore">{{ highScore }}</p>
             </div>
@@ -277,11 +265,17 @@ const conti = () => {
                 <p class="score">{{ score }}</p>
             </div>
         </div>
+
         <div class="cell" v-for="_ of cellNumTotal" :style="cellStyle"></div>
-        <div class="panel" v-for="panel of panels" :style="panelStyle(panel)"
-            :class="{ transition: transition, inAnimation: panel.inAnimation }">
+
+        <div class="panel" v-for="panel of panels" :style="panelStyle(panel)" :class="{
+            transition: transition,
+            popAnimation: panel.popAnimation,
+            growAnimation: panel.growAnimation
+        }">
             {{ 2 ** (panel.num + 1) }}
         </div>
+
         <button class="restart" @click="restart">リスタート</button>
     </div>
 </template>
@@ -292,6 +286,7 @@ const conti = () => {
     width: 690px;
     height: 690px;
     padding: 10px;
+    margin: 0 auto;
     gap: 10px;
     background-color: green;
     display: flex;
@@ -306,16 +301,16 @@ const conti = () => {
 .panel {
     background-color: gray;
     display: grid;
+    font-size: 1.5rem;
     place-content: center;
     position: absolute;
-    /* transition: 0.3s; */
 }
 
 .transition {
     transition: 0.3s;
 }
 
-.inAnimation {
+.popAnimation {
     animation: 0.3s pop;
 }
 
@@ -324,12 +319,26 @@ const conti = () => {
         scale: 0
     }
 
+    to {
+        scale: 1
+    }
+}
+
+.growAnimation {
+    animation: 0.3s grow;
+}
+
+@keyframes grow {
+    from {
+        scale: 1;
+    }
+
     50% {
-        scale: 1.2
+        scale: 1.2;
     }
 
     to {
-        scale: 1
+        scale: 1;
     }
 }
 
@@ -355,5 +364,20 @@ div.score {
 
 div.scores p {
     text-align: center;
+}
+
+button.restart {
+    width: 70%;
+    padding: 5px 0;
+    font-size: 1.2rem;
+    margin: 50px auto 0;
+    background-color: white;
+    color: darkgreen;
+    border: 2px solid darkgreen;
+    border-radius: 20px;
+}
+
+button.restart:hover {
+    background-color: rgb(222, 255, 222);
 }
 </style>

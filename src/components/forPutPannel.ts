@@ -1,5 +1,4 @@
-//フィールドサイズに応じたパネルの初期値(panel.numに代入)を返す。
-import { YX, yx } from "./class/YX.js";
+import { YX, yx } from "./class/YX.ts";
 
 export const randomNum = (cellNum: number) => {
     const index = (r: number, arr: number[]) => arr.findIndex((elm) => r < elm);

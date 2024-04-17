@@ -29,7 +29,7 @@ const toggleRule = () => {
 
   <TheStart v-if="startView" @on-click="startGame"></TheStart>
 
-  <TheGame v-else @on-click="backToStart" :cellNum="cellNum"></TheGame>
+  <TheGame v-else @on-click="backToStart" :cellNum="cellNum" :showingRule="showingRule"></TheGame>
 
   <RuleBtn @on-click="toggleRule"></RuleBtn>
   <RuleView :class="{ show: showingRule }"></RuleView>

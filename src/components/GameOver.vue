@@ -22,9 +22,28 @@ const restart = () => {
     height: 100%;
     top: 0;
     left: 0;
+    display: grid;
+    gap: 50px;
+    place-content: center;
 }
 
 p {
     color: white;
+    text-align: center;
+    font-size: 1.5rem;
+}
+
+button {
+    background-color: white;
+    border-radius: 15px;
+    color: darkgreen;
+    border: 1px solid darkgreen;
+    padding: 5px 50px;
+    font-size: 1.3rem;
+    transition: 0.3s;
+}
+
+button:hover {
+    background-color: rgb(206, 238, 206);
 }
 </style>
