@@ -11,6 +11,7 @@ import Panels from "./Panels.vue"
 import { getHighScore, updateHighScore } from "./highScore.ts"
 
 
+
 const props = defineProps({ cellNum: Number, showingRule: Boolean })
 const cellNum = <number>props.cellNum
 
@@ -75,7 +76,7 @@ onMounted(() => {
                     return null;
             }
         }
-        const dir = dir_(e.key) as YX
+        const dir = <YX>dir_(e.key)
         if (dir === null) return;
 
         let nextGenePanels: Panel[] = [];//衝突しない(消えない)パネルを入れていく
@@ -207,8 +208,10 @@ onMounted(() => {
 function isGameClear() {
     //const table = { 3: 7, 4: 10, 5: 12, 6: 13 };
     //短縮版
-    const table = { 3: 4, 4: 5, 5: 6, 6: 7 };
-    const c = table[cellNum];
+    //const table = { 3: 4, 4: 5, 5: 6, 6: 7 };
+    const map = new Map([[3, 4], [4, 5], [5, 6], [6, 7]]);
+    const c = map.get(cellNum);
+    //const c = table[cellNum];
     return panels.value.map(elm => elm.num).includes(c)
 }
 
