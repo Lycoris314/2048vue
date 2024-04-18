@@ -1,14 +1,14 @@
 <script setup lang="ts">
 import { ref, type Ref, computed, onMounted } from "vue"
-import { YX, yx } from "./class/YX.js"
-import { Panel } from "./class/panel.js"
+import { YX, yx } from "./class/YX.ts"
+import { Panel } from "./class/panel.ts"
 import { randomNum, emptyCells, randomSelect } from "./forPutPannel.ts"
 import GameOver from "./GameOver.vue"
 import GameClear from "./GameClear.vue"
 import Scores from "./Scores.vue"
 import Cells from "./Cells.vue"
 import Panels from "./Panels.vue"
-import { getHighScore, updateHighScore } from "./highScore.js"
+import { getHighScore, updateHighScore } from "./highScore.ts"
 
 
 const props = defineProps({ cellNum: Number, showingRule: Boolean })

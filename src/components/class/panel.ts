@@ -1,4 +1,4 @@
-import { YX, yx } from "./YX.js";
+import { YX } from "./YX.ts";
 
 export class Panel {
     vec: YX;

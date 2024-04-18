@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed } from "vue"
-import { Panel } from "./class/panel.js"
+import { Panel } from "./class/panel.ts"
 
 const props = defineProps({ cellNum: Number, panels: Object, transition: Boolean })
 
