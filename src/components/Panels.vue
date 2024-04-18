@@ -4,7 +4,7 @@ import { Panel } from "./class/panel.ts"
 
 const props = defineProps({ cellNum: Number, panels: Object, transition: Boolean })
 
-const cellSize = computed(() => (690 - (props.cellNum - 1) * 10) / <number>props.cellNum)
+const cellSize = computed(() => (690 - (<number>props.cellNum - 1) * 10) / <number>props.cellNum)
 
 const panelStyle = (panel: Panel) => {
     return {
