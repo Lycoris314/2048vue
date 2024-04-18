@@ -1,12 +1,12 @@
 <script setup lang="ts">
 import { computed } from "vue"
-import { Panel } from "./class/panel.ts"
+import { Panel } from "./class/panel.js"
 
 const props = defineProps({ cellNum: Number, panels: Object, transition: Boolean })
 
-const cellSize = computed(() => (690 - (props.cellNum - 1) * 10) / props.cellNum)
+const cellSize = computed(() => (690 - (<number>props.cellNum - 1) * 10) / <number>props.cellNum)
 
-const panelStyle = (panel) => {
+const panelStyle = (panel: Panel) => {
     return {
         width: `${cellSize.value}px`,
         height: `${cellSize.value}px`,

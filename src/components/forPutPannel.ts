@@ -24,7 +24,7 @@ export const emptyCells = (matrix: object[][]) =>
         .flat(1)
         .filter((elm) => elm !== null);
 
-export const randomSelect = (arr: []) => {
+export const randomSelect = (arr: any[]) => {
     const index = Math.floor(Math.random() * arr.length);
     return arr[index];
 };

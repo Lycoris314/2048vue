@@ -1,6 +1,6 @@
 <script setup lang="ts">
 const props = defineProps({ score: Number })
-const emit = defineEmits(["on-click-restart, on-click-conti"]);
+const emit = defineEmits(["on-click-restart", "on-click-conti"]);
 
 const restart = () => {
     emit('on-click-restart')

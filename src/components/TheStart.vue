@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref } from "vue";
 import H1 from "./H1.vue";
-import { getHighScore } from "./highScore.ts";
+import { getHighScore } from "./highScore.js";
 
 const checkBoxNum = ref(4);
 
