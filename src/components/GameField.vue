@@ -9,6 +9,7 @@ import Scores from "./Scores.vue"
 import Cells from "./Cells.vue"
 import Panels from "./Panels.vue"
 import { getHighScore, updateHighScore } from "./highScore.ts"
+import { range, transpose } from "ramda"
 
 
 
@@ -164,7 +165,7 @@ onMounted(() => {
         }
         //境界までのパネルの列(null="空"も含む)
         function path(vec: YX) {
-            const re = R.range(1, dist(vec) + 1).map((i: number) => {
+            const re = range(1, dist(vec) + 1).map((i: number) => {
                 const w = YX.add(vec, YX.scalar(i, dir));
                 return position.value[w.y][w.x]
             })
@@ -223,11 +224,11 @@ function noMove(matrix: Panel[][]) {
     const f = (mat: Panel[][]) =>
         mat.every((arr) => {
             const row = arr.map((elm) => elm.num);
-            return R.range(0, arr.length - 1).every(
+            return range(0, arr.length - 1).every(
                 (n: number) => row[n] !== row[n + 1]
             );
         });
-    return f(matrix) && f(R.transpose(matrix));
+    return f(matrix) && f(transpose(matrix));
 };
 
 //リスタートボタンを押すと
