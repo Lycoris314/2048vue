@@ -3,10 +3,10 @@ import { computed } from "vue"
 
 const props = defineProps({ cellNum: Number })
 
-const cellSize = computed(() => (690 - (<number>props.cellNum - 1) * 10) / <number>props.cellNum)
+const cellSize = computed(() => (690 - (props.cellNum - 1) * 10) / <number>props.cellNum)
 
 const cellNumTotal = computed(() =>
-    new Array((<number>props.cellNum) ** 2))
+    new Array(props.cellNum ** 2))
 
 const cellStyle = {
     width: `${cellSize.value}px`,

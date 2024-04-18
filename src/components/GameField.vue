@@ -12,12 +12,10 @@ import { getHighScore, updateHighScore } from "./highScore.ts"
 import { range, transpose } from "ramda"
 
 
-
 const props = defineProps({ cellNum: Number, showingRule: Boolean })
-const cellNum = <number>props.cellNum
 
 const score = ref(0);
-const highScore = ref(getHighScore(props.cellNum as number));
+const highScore = ref(getHighScore(props.cellNum));
 
 const gameOver = ref(false); //ゲームーバー画面の表示
 const gameClear = ref(false); //ゲームクリア画面の表示
@@ -30,7 +28,7 @@ const position = computed(() => {
     const num = props.cellNum;
     const mat = new Array(num).fill(null).map(_ => new Array(num).fill(null));
 
-    panels.value.forEach((elm: Panel) => {
+    panels.value.forEach((elm) => {
         mat[elm.vec.y][elm.vec.x] = elm;
     })
     return mat;
@@ -40,7 +38,7 @@ const transition = ref(false); //移動アニメーション中にtrue
 
 const putPanel = () => {
     const vec = randomSelect(emptyCells(position.value))
-    const panel = new Panel(vec, <number>randomNum(cellNum))
+    const panel = new Panel(vec, randomNum(props.cellNum))
 
     panels.value.push(panel);
 }
@@ -51,7 +49,7 @@ putPanel();
 onMounted(() => {
 
     const html = document.querySelector("html");
-    if (html === null) return;
+
     html.addEventListener("keydown", (e) => {
 
         if (transition.value) return;
@@ -77,14 +75,14 @@ onMounted(() => {
                     return null;
             }
         }
-        const dir = <YX>dir_(e.key)
+        const dir = dir_(e.key)
         if (dir === null) return;
 
         let nextGenePanels: Panel[] = [];//衝突しない(消えない)パネルを入れていく
         let growPanels: YX[] = [];//衝突されてgrowするパネルの位置を入れていく
         let moving: [Panel, number][] = [];//各パネルの移動距離を記録
 
-        panels.value.forEach((elm: Panel) => {
+        panels.value.forEach((elm) => {
 
             const arr = toNum(path(elm.vec));
 
@@ -140,13 +138,13 @@ onMounted(() => {
             //ゲームクリアの時
             if (isGameClear() && !afterClear.value) {
                 gameClear.value = true;
-                updateHighScore(cellNum, score.value);
+                updateHighScore(props.cellNum, score.value);
 
             }
             //ゲームオーバーの時
             else if (isGameOver()) {
                 gameOver.value = true;
-                updateHighScore(cellNum, score.value);
+                updateHighScore(props.cellNum, score.value);
             }
         })
 
@@ -154,18 +152,18 @@ onMounted(() => {
         //移動方向に向かってフィールド境界までの距離
         function dist(vec: YX) {
             return dir.y === 1
-                ? cellNum - vec.y - 1
+                ? props.cellNum - vec.y - 1
                 : dir.y === -1
                     ? vec.y
                     : dir.x === 1
-                        ? cellNum - vec.x - 1
+                        ? props.cellNum - vec.x - 1
                         : dir.x === -1
                             ? vec.x
                             : 0;
         }
         //境界までのパネルの列(null="空"も含む)
         function path(vec: YX) {
-            const re = range(1, dist(vec) + 1).map((i: number) => {
+            const re = range(1, dist(vec) + 1).map((i) => {
                 const w = YX.add(vec, YX.scalar(i, dir));
                 return position.value[w.y][w.x]
             })
@@ -174,14 +172,14 @@ onMounted(() => {
         //pathからnullを取り除いた後、panel.numの列に変換
         function toNum(path: (Panel | null)[]) {
             return path.filter(elm => elm !== null)
-                .map(elm => (<Panel>elm).num)
+                .map(elm => elm.num)
         }
 
         //例 info(1,[1,2,2])=>{true,2}
         //info(1,[1,1,2,2,1]=>{false,2})
         function info(n: number, arr: number[]) {
             let count = 0;
-            const isDisap = (n: number, arr: number[]): Object => {
+            const isDisap = (n: number, arr: number[]): boolean => {
                 //基底部
                 if (arr.length === 0) return false;
 
@@ -207,17 +205,13 @@ onMounted(() => {
 })
 
 function isGameClear() {
-    //const table = { 3: 7, 4: 10, 5: 12, 6: 13 };
-    //短縮版
-    //const table = { 3: 4, 4: 5, 5: 6, 6: 7 };
-    const map = new Map([[3, 4], [4, 5], [5, 6], [6, 7]]);
-    const c = map.get(cellNum);
-    //const c = table[cellNum];
+    const map = new Map([[3, 7], [4, 10], [5, 12], [6, 13]]);
+    const c = map.get(props.cellNum);
     return panels.value.map(elm => elm.num).includes(c)
 }
 
 function isGameOver() {
-    return panels.value.length === cellNum ** 2
+    return panels.value.length === props.cellNum ** 2
         && noMove(position.value)
 }
 function noMove(matrix: Panel[][]) {
@@ -225,7 +219,7 @@ function noMove(matrix: Panel[][]) {
         mat.every((arr) => {
             const row = arr.map((elm) => elm.num);
             return range(0, arr.length - 1).every(
-                (n: number) => row[n] !== row[n + 1]
+                (n) => row[n] !== row[n + 1]
             );
         });
     return f(matrix) && f(transpose(matrix));
@@ -240,7 +234,7 @@ const restart = () => {
     score.value = 0;
     panels.value = [];
     transition.value = false;
-    highScore.value = getHighScore(cellNum)
+    highScore.value = getHighScore(props.cellNum)
     putPanel();
     putPanel();
 }
@@ -302,4 +296,4 @@ button.restart {
 button.restart:hover {
     background-color: rgb(222, 255, 222);
 }
-</style>./class/YX.js
+</style>

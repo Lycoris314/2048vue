@@ -2,7 +2,7 @@
 
 import { yx } from "./class/YX.ts";
 
-export const randomNum = (cellNum: number) => {
+export const randomNum = (cellNum :number) => {
     const index = (r: number, arr: number[]) => arr.findIndex((elm) => r < elm);
     const r = Math.random();
 

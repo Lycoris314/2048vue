@@ -13,7 +13,6 @@
         "target": "ES2022",
         "lib": ["ES2023", "DOM"],
         "moduleResolution": "bundler",
-        "allowImportingTsExtensions": true,
-        "strictNullChecks": false
+        "allowImportingTsExtensions": true
     }
 }
