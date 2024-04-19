@@ -15,7 +15,7 @@ import { range, transpose } from "ramda"
 const props = defineProps({ cellNum: Number, showingRule: Boolean })
 
 const score = ref(0);
-const highScore = ref(getHighScore(<number>props.cellNum));
+const highScore = ref(getHighScore(props.cellNum));
 
 const gameOver = ref(false); //ゲームーバー画面の表示
 const gameClear = ref(false); //ゲームクリア画面の表示
@@ -38,7 +38,7 @@ const transition = ref(false); //移動アニメーション中にtrue
 
 const putPanel = () => {
     const vec = randomSelect(emptyCells(position.value))
-    const panel = new Panel(vec, randomNum(<number>props.cellNum))
+    const panel = new Panel(vec, randomNum(props.cellNum))
 
     panels.value.push(panel);
 }
@@ -138,13 +138,13 @@ onMounted(() => {
             //ゲームクリアの時
             if (isGameClear() && !afterClear.value) {
                 gameClear.value = true;
-                updateHighScore(<number>props.cellNum, score.value);
+                updateHighScore(props.cellNum, score.value);
 
             }
             //ゲームオーバーの時
             else if (isGameOver()) {
                 gameOver.value = true;
-                updateHighScore(<number>props.cellNum, score.value);
+                updateHighScore(props.cellNum, score.value);
             }
         })
 
@@ -152,11 +152,11 @@ onMounted(() => {
         //移動方向に向かってフィールド境界までの距離
         function dist(vec: YX) {
             return (<YX>dir).y === 1
-                ? <number>props.cellNum - vec.y - 1
+                ? props.cellNum - vec.y - 1
                 : (<YX>dir).y === -1
                     ? vec.y
                     : (<YX>dir).x === 1
-                        ? <number>props.cellNum - vec.x - 1
+                        ? props.cellNum - vec.x - 1
                         : (<YX>dir).x === -1
                             ? vec.x
                             : 0;
@@ -206,7 +206,7 @@ onMounted(() => {
 
 function isGameClear() {
     const map = new Map([[3, 7], [4, 10], [5, 12], [6, 13]]);
-    const c = map.get(<number>props.cellNum) as number;
+    const c = map.get(props.cellNum) as number;
     return panels.value.map(elm => elm.num).includes(c)
 }
 
@@ -234,7 +234,7 @@ const restart = () => {
     score.value = 0;
     panels.value = [];
     transition.value = false;
-    highScore.value = getHighScore(<number>props.cellNum)
+    highScore.value = getHighScore(props.cellNum)
     putPanel();
     putPanel();
 }
