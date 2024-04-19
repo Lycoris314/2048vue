@@ -211,7 +211,7 @@ function isGameClear() {
 }
 
 function isGameOver() {
-    return panels.value.length === (<number>props.cellNum) ** 2
+    return panels.value.length === (props.cellNum) ** 2
         && noMove(position.value)
 }
 function noMove(matrix: Panel[][]) {
