@@ -24,6 +24,10 @@ const props = defineProps({ cellNum: Number, showingRule: Boolean })
 
 </template>
 <style scoped>
+html {
+    overflow-y: hidden;
+}
+
 .container {
     /* height: max(100vh, calc(100vw + 100px)); */
     width: max-content;
