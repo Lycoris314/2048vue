@@ -42,11 +42,11 @@ const panelStyle = (panel: Panel) => {
 }
 
 .transition {
-    transition: 0.3s;
+    transition: 0.2s;
 }
 
 .popAnimation {
-    animation: 0.3s pop;
+    animation: 0.25s pop;
 }
 
 @keyframes pop {

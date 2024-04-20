@@ -54,15 +54,15 @@ const preventEventCondition = computed(() =>
 onMounted(() => {
     const html = <HTMLHtmlElement>document.querySelector("html");
 
-    html.style.overflowY = "hidden";
+    html.style.overflowY = "hidden"; //スクロール禁止
 
     let startX: number | null, endX: number | null, startY: number | null, endY: number | null
 
+    //スマホのフリックイベント
     html.addEventListener("touchstart", (e) => {
         if (preventEventCondition.value) return;
         startX = e.touches[0].pageX;
         startY = e.touches[0].pageY;
-        console.log(startY, startX);
     })
     html.addEventListener("touchmove", (e) => {
         if (preventEventCondition.value) return;
@@ -74,7 +74,6 @@ onMounted(() => {
 
         function calcDir(dY: number, dX: number) {
 
-            //if (Math.abs(dX) + Math.abs(dY) < 10) return null
             if (dX == 0 && dY > 0) return yx(1, 0)
             if (dX == 0 && dY < 0) return yx(-1, 0)
             const tangent = dY / dX
@@ -98,6 +97,7 @@ onMounted(() => {
         startY = null; endY = null; startX = null; startY = null;
     })
 
+    //キーボードイベント
     html.addEventListener("keydown", (e) => {
 
         if (preventEventCondition.value) return;
@@ -200,7 +200,6 @@ function noMove(matrix: Panel[][]) {
     return f(matrix) && f(transpose(matrix));
 };
 
-const renderKey = ref(0);
 //リスタートボタンを押すと
 const restart = () => {
     gameOver.value = false;
@@ -232,8 +231,6 @@ const fieldStyle = computed(() => {
         height: `${fieldSize.value}px`
     }
 })
-
-
 
 </script>
 <template>
