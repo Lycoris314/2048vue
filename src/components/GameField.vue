@@ -56,17 +56,14 @@ onMounted(() => {
 
     let startX: number, endX: number, startY: number, endY: number
     html.addEventListener("touchstart", (e) => {
-        e.preventDefault()
         startX = e.touches[0].pageX;
         startY = e.touches[0].pageY;
     })
     html.addEventListener("touchmove", (e) => {
-        e.preventDefault()
         endX = e.changedTouches[0].pageX;
         endY = e.changedTouches[0].pageY;
     })
     html.addEventListener("touchend", (e) => {
-        e.preventDefault()
         if (preventEventCondition.value) return;
 
         function calcDir(dY: number, dX: number) {
@@ -200,8 +197,12 @@ const restart = () => {
     afterClear.value = false;
     score.value = 0;
     panels.value = [];
+    console.log(panels.value);
     transition.value = false;
     highScore.value = getHighScore(cellNum.value)
+
+
+
     putPanel();
     putPanel();
 }
