@@ -26,7 +26,6 @@ const props = defineProps({ cellNum: Number, showingRule: Boolean })
 
 <style scoped>
 .container {
-    /* height: max(100vh, calc(100vw + 100px)); */
     width: max-content;
     margin: 0 auto;
     padding: 0 30px;

@@ -54,6 +54,8 @@ const preventEventCondition = computed(() =>
 onMounted(() => {
     const html = <HTMLHtmlElement>document.querySelector("html");
 
+    html.style.overflowY = "hidden";
+
     let startX: number | null, endX: number | null, startY: number | null, endY: number | null
 
     html.addEventListener("touchstart", (e) => {

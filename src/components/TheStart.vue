@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from "vue";
+import { ref, onMounted } from "vue";
 import H1 from "./H1.vue";
 import { getHighScore } from "./highScore.ts";
 
@@ -10,6 +10,11 @@ const emit = defineEmits(["on-click"]);
 const gameStart = () => {
     emit("on-click", Number(checkBoxNum.value));
 }
+
+onMounted(() => {
+    const html = <HTMLHtmlElement>document.querySelector("html");
+    html.style.overflowY = "auto";
+})
 
 </script>
 
