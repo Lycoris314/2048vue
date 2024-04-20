@@ -5,8 +5,6 @@ import { computed, inject, type Ref } from "vue"
 
 const fieldSize = inject("fieldSize") as Ref<number>
 const containerStyle = computed(() => {
-    console.log("sss");
-
     const h = fieldSize.value + 250;
     return { height: `max(100vh, ${h}px` }
 })

@@ -48,16 +48,48 @@ const putPanel = () => {
 putPanel();
 putPanel();
 
-onMounted(() => {
+const preventEventCondition = computed(() =>
+    transition.value || props.showingRule || gameOver.value || gameClear.value)
 
+onMounted(() => {
     const html = <HTMLHtmlElement>document.querySelector("html");
+
+    let startX: number, endX: number, startY: number, endY: number
+    html.addEventListener("touchstart", (e) => {
+        startX = e.touches[0].pageX;
+        startY = e.touches[0].pageY;
+    })
+    html.addEventListener("touchmove", (e) => {
+        endX = e.changedTouches[0].pageX;
+        endY = e.changedTouches[0].pageY;
+    })
+    html.addEventListener("touchend", (e) => {
+        if (preventEventCondition.value) return;
+
+        function calcDir(dY: number, dX: number) {
+
+            if (dX == 0 && dY > 0) return yx(1, 0)
+            if (dX == 0 && dY < 0) return yx(-1, 0)
+            const tangent = dY / dX
+            if (-0.5 < tangent && tangent < 0.5) {
+                if (dX > 0) return yx(0, 1)
+                else return yx(0, -1)
+            }
+            if (tangent > 2 || tangent < -2) {
+                if (dY > 0) return yx(1, 0)
+                else return yx(-1, 0)
+            }
+            return null
+        }
+
+        const dir = calcDir(endY - startY, endX - startX)
+        if (dir === null) return;
+        DoAfterCalcDir(dir)
+    })
 
     html.addEventListener("keydown", (e) => {
 
-        if (transition.value) return;
-        if (props.showingRule) return;
-        if (gameOver.value) return;
-        if (gameClear.value) return;
+        if (preventEventCondition.value) return;
 
         function calcDir(key: string) {
             switch (key) {
@@ -79,58 +111,62 @@ onMounted(() => {
         }
         const dir = calcDir(e.key)
         if (dir === null) return;
-
-        const { nextGenePanels, growPanels, moveLengthArr } =
-            forNextGene(dir, panels.value, position.value, cellNum.value)
-
-        //１つも移動しないならここで中断(パネルは追加しない)
-        if (moveLengthArr.every(elm => elm[1] === 0)) return;
-
-        //以下移動アニメーション用
-        transition.value = true;
-
-        moveLengthArr.forEach(elm => {
-            elm[0].slide(YX.scalar(elm[1], dir));
-        })
-
-        new Promise(resolve => {
-            setTimeout(() => {
-                resolve("");
-            }, 300)
-        }).then(() => {
-            //移動アニメーション終わり
-            transition.value = false;
-
-            panels.value = nextGenePanels
-
-            //衝突されたパネルをgrowさせる。
-            growPanels.forEach((elm) => {
-                const panel = panels.value.find(pa => {
-                    return pa.vec.y === elm.y && pa.vec.x === elm.x;
-                })
-                if (panel !== undefined) {
-                    panel.grow();
-                    //得点加算
-                    score.value += 2 ** (panel.num + 1)
-                }
-            })
-
-            putPanel();
-
-            //ゲームクリアの時
-            if (isGameClear() && !afterClear.value) {
-                gameClear.value = true;
-                updateHighScore(cellNum.value, score.value);
-
-            }
-            //ゲームオーバーの時
-            else if (isGameOver()) {
-                gameOver.value = true;
-                updateHighScore(cellNum.value, score.value);
-            }
-        })
+        DoAfterCalcDir(dir)
     })
 })
+
+function DoAfterCalcDir(dir: YX) {
+
+    const { nextGenePanels, growPanels, moveLengthArr } =
+        forNextGene(dir, panels.value, position.value, cellNum.value)
+
+    //１つも移動しないならここで中断(パネルは追加しない)
+    if (moveLengthArr.every(elm => elm[1] === 0)) return;
+
+    //以下移動アニメーション用
+    transition.value = true;
+
+    moveLengthArr.forEach(elm => {
+        elm[0].slide(YX.scalar(elm[1], dir));
+    })
+
+    new Promise(resolve => {
+        setTimeout(() => {
+            resolve("");
+        }, 300)
+    }).then(() => {
+        //移動アニメーション終わり
+        transition.value = false;
+
+        panels.value = nextGenePanels
+
+        //衝突されたパネルをgrowさせる。
+        growPanels.forEach((elm) => {
+            const panel = panels.value.find(pa => {
+                return pa.vec.y === elm.y && pa.vec.x === elm.x;
+            })
+            if (panel !== undefined) {
+                panel.grow();
+                //得点加算
+                score.value += 2 ** (panel.num + 1)
+            }
+        })
+
+        putPanel();
+
+        //ゲームクリアの時
+        if (isGameClear() && !afterClear.value) {
+            gameClear.value = true;
+            updateHighScore(cellNum.value, score.value);
+
+        }
+        //ゲームオーバーの時
+        else if (isGameOver()) {
+            gameOver.value = true;
+            updateHighScore(cellNum.value, score.value);
+        }
+    })
+}
 
 function isGameClear() {
     const map = new Map([[3, 7], [4, 10], [5, 12], [6, 13]]);

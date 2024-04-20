@@ -7,7 +7,6 @@ const props = defineProps({ panels: Object, transition: Boolean })
 const cellSize = inject("cellSize") as Ref<number>
 
 const panelStyle = (panel: Panel) => {
-    console.log(cellSize.value);
 
     return {
         width: `${cellSize.value}px`,
