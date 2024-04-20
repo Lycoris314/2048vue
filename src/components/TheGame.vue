@@ -23,6 +23,7 @@ const props = defineProps({ cellNum: Number, showingRule: Boolean })
     </div>
 
 </template>
+
 <style scoped>
 .container {
     /* height: max(100vh, calc(100vw + 100px)); */
@@ -31,6 +32,7 @@ const props = defineProps({ cellNum: Number, showingRule: Boolean })
     padding: 0 30px;
     box-shadow: 0 0 10px 10px silver;
     background-color: antiquewhite;
+
 }
 
 button.toStart {
