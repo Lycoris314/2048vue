@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, type Ref, computed, onMounted } from "vue"
+import { ref, type Ref, computed, onMounted, inject } from "vue"
 import { YX, yx } from "./class/YX.ts"
 import { Panel } from "./class/panel.ts"
 import { randomNum, emptyCells, randomSelect } from "./forPutPannel.ts"
@@ -10,12 +10,15 @@ import Cells from "./Cells.vue"
 import Panels from "./Panels.vue"
 import { getHighScore, updateHighScore } from "./highScore.ts"
 import { range, transpose } from "ramda"
+import { forNextGene } from "./forNextGene.ts"
 
 
-const props = defineProps({ cellNum: Number, showingRule: Boolean })
+const props = defineProps({ showingRule: { default: false } })
 
+const cellNum = inject("cellNum") as Ref<number>;
+const fieldSize = inject("fieldSize") as Ref<number>;
 const score = ref(0);
-const highScore = ref(getHighScore(props.cellNum));
+const highScore = ref(getHighScore(cellNum.value));
 
 const gameOver = ref(false); //ゲームーバー画面の表示
 const gameClear = ref(false); //ゲームクリア画面の表示
@@ -25,8 +28,7 @@ const panels: Ref<Panel[]> = ref([]);
 
 const position = computed(() => {
     //初期化
-    const num = props.cellNum;
-    const mat = new Array(num).fill(null).map(_ => new Array(num).fill(null));
+    const mat = new Array(cellNum.value).fill(null).map(_ => new Array(cellNum.value).fill(null));
 
     panels.value.forEach((elm) => {
         mat[elm.vec.y][elm.vec.x] = elm;
@@ -38,7 +40,7 @@ const transition = ref(false); //移動アニメーション中にtrue
 
 const putPanel = () => {
     const vec = randomSelect(emptyCells(position.value))
-    const panel = new Panel(vec, randomNum(props.cellNum))
+    const panel = new Panel(vec, randomNum(cellNum.value))
 
     panels.value.push(panel);
 }
@@ -57,7 +59,7 @@ onMounted(() => {
         if (gameOver.value) return;
         if (gameClear.value) return;
 
-        function dir_(key: string) {
+        function calcDir(key: string) {
             switch (key) {
                 case "ArrowUp":
                 case "w":
@@ -75,39 +77,19 @@ onMounted(() => {
                     return null;
             }
         }
-        const dir = dir_(e.key)
+        const dir = calcDir(e.key)
         if (dir === null) return;
 
-        let nextGenePanels: Panel[] = [];//衝突しない(消えない)パネルを入れていく
-        let growPanels: YX[] = [];//衝突されてgrowするパネルの位置を入れていく
-        let moving: [Panel, number][] = [];//各パネルの移動距離を記録
+        const { nextGenePanels, growPanels, moveLengthArr } =
+            forNextGene(dir, panels.value, position.value, cellNum.value)
 
-        panels.value.forEach((elm) => {
-
-            const arr = toNum(path(elm.vec));
-
-            //自身が消失するかどうか、さらに移動方向に向かってパネルが消失する数を返す(自身が消失するならそれも含む)。
-            const i = info(elm.num, arr)
-
-            //移動距離
-            const moveLength = dist(elm.vec) - arr.length + i.disapCount;
-            //自身が消える場合にgrowするパネルの位置を記録
-            if (i.isDisap) {
-                growPanels.push(YX.add(elm.vec, YX.scalar(moveLength, dir)))
-                //消えない場合は次の世代へ
-            } else {
-                nextGenePanels.push(elm)
-            }
-
-            moving.push([elm, moveLength]);
-        })
         //１つも移動しないならここで中断(パネルは追加しない)
-        if (moving.every(elm => elm[1] === 0)) return;
+        if (moveLengthArr.every(elm => elm[1] === 0)) return;
 
         //以下移動アニメーション用
         transition.value = true;
 
-        moving.forEach(elm => {
+        moveLengthArr.forEach(elm => {
             elm[0].slide(YX.scalar(elm[1], dir));
         })
 
@@ -138,80 +120,26 @@ onMounted(() => {
             //ゲームクリアの時
             if (isGameClear() && !afterClear.value) {
                 gameClear.value = true;
-                updateHighScore(props.cellNum, score.value);
+                updateHighScore(cellNum.value, score.value);
 
             }
             //ゲームオーバーの時
             else if (isGameOver()) {
                 gameOver.value = true;
-                updateHighScore(props.cellNum, score.value);
+                updateHighScore(cellNum.value, score.value);
             }
         })
-
-
-        //移動方向に向かってフィールド境界までの距離
-        function dist(vec: YX) {
-            return (<YX>dir).y === 1
-                ? props.cellNum - vec.y - 1
-                : (<YX>dir).y === -1
-                    ? vec.y
-                    : (<YX>dir).x === 1
-                        ? props.cellNum - vec.x - 1
-                        : (<YX>dir).x === -1
-                            ? vec.x
-                            : 0;
-        }
-        //境界までのパネルの列(null="空"も含む)
-        function path(vec: YX) {
-            const re = range(1, dist(vec) + 1).map((i) => {
-                const w = YX.add(vec, YX.scalar(i, <YX>dir));
-                return position.value[w.y][w.x]
-            })
-            return re;
-        }
-        //pathからnullを取り除いた後、panel.numの列に変換
-        function toNum(path: (Panel | null)[]) {
-            return path.filter((elm) => elm !== null)
-                .map(elm => (elm as Panel).num)
-        }
-
-        //例 info(1,[1,2,2])=>{true,2}
-        //info(1,[1,1,2,2,1]=>{false,2})
-        function info(n: number, arr: number[]) {
-            let count = 0;
-            const isDisap = (n: number, arr: number[]): boolean => {
-                //基底部
-                if (arr.length === 0) return false;
-
-                if (arr.length === 1) {
-                    if (arr[0] === n) {
-                        count++;
-                        return true;
-                    } else {
-                        return false;
-                    }
-                }
-                //再帰部
-                if (arr.at(-1) === arr.at(-2)) {
-                    count++;
-                    return isDisap(n, arr.slice(0, -2));
-                } else {
-                    return isDisap(n, arr.slice(0, -1));
-                }
-            };
-            return { isDisap: isDisap(n, arr), disapCount: count };
-        };
     })
 })
 
 function isGameClear() {
     const map = new Map([[3, 7], [4, 10], [5, 12], [6, 13]]);
-    const c = map.get(props.cellNum) as number;
+    const c = map.get(cellNum.value) as number;
     return panels.value.map(elm => elm.num).includes(c)
 }
 
 function isGameOver() {
-    return panels.value.length === (props.cellNum) ** 2
+    return panels.value.length === (cellNum.value) ** 2
         && noMove(position.value)
 }
 function noMove(matrix: Panel[][]) {
@@ -234,7 +162,7 @@ const restart = () => {
     score.value = 0;
     panels.value = [];
     transition.value = false;
-    highScore.value = getHighScore(props.cellNum)
+    highScore.value = getHighScore(cellNum.value)
     putPanel();
     putPanel();
 }
@@ -248,9 +176,16 @@ const conti = () => {
     }
 }
 
+const fieldStyle = computed(() => {
+    return {
+        width: `${fieldSize.value}px`,
+        height: `${fieldSize.value}px`
+    }
+})
+
 </script>
 <template>
-    <div class="field">
+    <div class="field" :style="fieldStyle">
         <GameOver :score="score" @on-click="restart" v-if="gameOver"></GameOver>
         <GameClear :score="score" v-if="gameClear" @on-click-restart="restart" @on-click-conti="conti"></GameClear>
 
@@ -259,20 +194,17 @@ const conti = () => {
             <template #score>{{ score }}</template>
         </Scores>
 
-        <Cells :cellNum="props.cellNum"></Cells>
+        <Cells></Cells>
 
-        <Panels :panels="panels" :transition="transition" :cellNum="props.cellNum">
-        </Panels>
-
+        <Panels :panels="panels" :transition="transition"></Panels>
         <button class="restart" @click="restart">リスタート</button>
     </div>
+
 </template>
 
 
 <style scoped>
 .field {
-    width: 690px;
-    height: 690px;
     padding: 10px;
     margin: 0 auto;
     gap: 10px;
@@ -281,6 +213,8 @@ const conti = () => {
     flex-wrap: wrap;
     position: relative;
 }
+
+
 
 button.restart {
     width: 70%;

@@ -29,7 +29,7 @@ const gameStart = () => {
 
         <h2>ハイスコア</h2>
         <table>
-            <tr v-for="  i   of   [3, 4, 5, 6]">
+            <tr v-for="  i of [3, 4, 5, 6]">
                 <td>{{ i }}×{{ i }}</td>
                 <td>{{ getHighScore(i) }}点</td>
             </tr>
@@ -40,7 +40,7 @@ const gameStart = () => {
 <style scoped>
 .container {
     min-height: 100vh;
-    width: 800px;
+    width: 80%;
     margin: 0 auto;
     padding: 0 30px;
     box-shadow: 0 0 10px 10px silver;

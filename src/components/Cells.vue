@@ -1,18 +1,20 @@
 <script setup lang="ts">
-import { computed } from "vue"
+import { computed, inject, type Ref } from "vue"
 
-const props = defineProps({ cellNum: Number }) as { cellNum: number }
-
-
-const cellSize = computed(() => (690 - (props.cellNum - 1) * 10) / props.cellNum)
+const cellNum = inject("cellNum") as Ref<number>
+const cellSize = inject("cellSize") as Ref<number>
 
 const cellNumTotal = computed(() =>
-    new Array((props.cellNum) ** 2))
+    new Array(cellNum.value ** 2))
 
-const cellStyle = {
-    width: `${cellSize.value}px`,
-    height: `${cellSize.value}px`
-}
+const cellStyle = computed(() => {
+    console.log(cellSize.value);
+
+    return {
+        width: `${cellSize.value}px`,
+        height: `${cellSize.value}px`
+    }
+})
 </script>
 
 <template>

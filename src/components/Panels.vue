@@ -1,12 +1,14 @@
 <script setup lang="ts">
-import { computed } from "vue"
+import { inject, type Ref } from "vue"
 import { Panel } from "./class/panel.ts"
 
-const props = defineProps({ cellNum: Number, panels: Object, transition: Boolean })
+const props = defineProps({ panels: Object, transition: Boolean })
 
-const cellSize = computed(() => (690 - (<number>props.cellNum - 1) * 10) / <number>props.cellNum)
+const cellSize = inject("cellSize") as Ref<number>
 
 const panelStyle = (panel: Panel) => {
+    console.log(cellSize.value);
+
     return {
         width: `${cellSize.value}px`,
         height: `${cellSize.value}px`,
@@ -16,6 +18,7 @@ const panelStyle = (panel: Panel) => {
         backgroundColor: Panel.COLORS[panel.num > 14 ? 14 : panel.num]
     }
 }
+
 </script>
 
 <template>

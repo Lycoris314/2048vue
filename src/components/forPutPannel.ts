@@ -13,6 +13,9 @@ export const randomNum = (cellNum: number): number => {
         return index(r, [0.4, 0.7, 0.9, 1]);
     } else if (cellNum == 6) {
         return index(r, [0.3, 0.5, 0.7, 0.8, 0.9, 1]);
+    } else {
+        console.log("error");
+        return 0;
     }
 };
 

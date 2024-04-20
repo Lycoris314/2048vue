@@ -19,7 +19,7 @@ button {
     padding: 10px 20px;
     position: fixed;
     bottom: 0;
-    right: calc(50% - 370px);
+    right: calc(50% - min(40%, 350px));
     z-index: 100;
 }
 
