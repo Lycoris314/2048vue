@@ -12,14 +12,6 @@ const windowWidth = ref(window.innerWidth)
 const cellNum = ref(4);
 provide("cellNum", cellNum);
 
-onMounted(() => {
-  window.addEventListener("resize", () => {
-    windowWidth.value = window.innerWidth
-    console.log(windowWidth.value, cellSize.value);
-
-  })
-})
-
 const fieldSize = computed(() => Math.min(windowWidth.value * 0.8, 700));
 const cellSize = computed(() => (fieldSize.value - (cellNum.value - 1) * 10) / cellNum.value)
 
@@ -39,6 +31,14 @@ const backToStart = () => {
 const toggleRule = () => {
   showingRule.value = !showingRule.value
 }
+
+onMounted(() => {
+  window.addEventListener("resize", () => {
+    windowWidth.value = window.innerWidth
+    console.log(windowWidth.value, cellSize.value);
+
+  })
+})
 
 </script>
 

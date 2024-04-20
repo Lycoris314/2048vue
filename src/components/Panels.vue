@@ -14,7 +14,9 @@ const panelStyle = (panel: Panel) => {
 
         top: `${panel.vec.y * (cellSize.value + 10) + 10}px`,
         left: `${panel.vec.x * (cellSize.value + 10) + 10}px`,
-        backgroundColor: Panel.COLORS[panel.num > 14 ? 14 : panel.num]
+        backgroundColor: Panel.COLORS[panel.num > 14 ? 14 : panel.num],
+
+        fontSize: `${1.2 + (cellSize.value - 100) / 100}rem`,
     }
 }
 

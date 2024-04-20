@@ -94,7 +94,7 @@ button.gameStart:active {
 table {
 
     border-collapse: collapse;
-    margin: 50px auto 0;
+    margin: 40px auto 0;
 }
 
 /* スクロール時の余白のため */
@@ -102,7 +102,7 @@ table::after {
     content: "";
     display: block;
     width: 100%;
-    height: 20px;
+    height: 60px;
 }
 
 td {

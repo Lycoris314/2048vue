@@ -11,8 +11,8 @@ const emit = defineEmits(["on-click"]);
             <p>目指せ 2048! (サイズ4×4の場合)</p>
             <hr />
             <h2>操作方法</h2>
-            <p>※キーボード操作のみ受け付けます。</p>
-            <p class="under">上下左右キー(またはWSADキー)</p>
+            <p>※キーボード操作<span class="under">上下左右キー(またはWSADキー)</span>およびフリック操作を受け付けます。</p>
+
             <p>
                 同じパネルが重なると合体して数値が２倍となり、合体した値がスコアに加算されます。クリア後もパネルを動かせなくなるまで続けることができます。
             </p>
@@ -71,7 +71,7 @@ p {
     font-family: sans-serif;
 }
 
-p.under {
+.under {
     text-decoration: underline;
 }
 </style>
