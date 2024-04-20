@@ -55,11 +55,15 @@ onMounted(() => {
     const html = <HTMLHtmlElement>document.querySelector("html");
 
     let startX: number, endX: number, startY: number, endY: number
+
     html.addEventListener("touchstart", (e) => {
+        if (preventEventCondition.value) return;
         startX = e.touches[0].pageX;
         startY = e.touches[0].pageY;
+        console.log(startY, startX);
     })
     html.addEventListener("touchmove", (e) => {
+        if (preventEventCondition.value) return;
         endX = e.changedTouches[0].pageX;
         endY = e.changedTouches[0].pageY;
     })
@@ -68,6 +72,7 @@ onMounted(() => {
 
         function calcDir(dY: number, dX: number) {
 
+            if (Math.abs(dX) + Math.abs(dY) < 10) return null
             if (dX == 0 && dY > 0) return yx(1, 0)
             if (dX == 0 && dY < 0) return yx(-1, 0)
             const tangent = dY / dX
@@ -189,22 +194,21 @@ function noMove(matrix: Panel[][]) {
     return f(matrix) && f(transpose(matrix));
 };
 
+const renderKey = ref(0);
 //リスタートボタンを押すと
 const restart = () => {
+    // gameOver.value = false;
+    // gameClear.value = false;
+    // afterClear.value = false;
+    // score.value = 0;
+    // panels.value = [];
 
-    gameOver.value = false;
-    gameClear.value = false;
-    afterClear.value = false;
-    score.value = 0;
-    panels.value = [];
-    console.log(panels.value);
-    transition.value = false;
-    highScore.value = getHighScore(cellNum.value)
+    // transition.value = false;
+    // highScore.value = getHighScore(cellNum.value)
 
+    // putPanel();
+    // putPanel();
 
-
-    putPanel();
-    putPanel();
 }
 //そのまま続けるボタンを押すと
 const conti = () => {
@@ -223,6 +227,8 @@ const fieldStyle = computed(() => {
     }
 })
 
+
+
 </script>
 <template>
     <div class="field" :style="fieldStyle">
@@ -237,7 +243,7 @@ const fieldStyle = computed(() => {
         <Cells></Cells>
 
         <Panels :panels="panels" :transition="transition"></Panels>
-        <button class="restart" @click="restart">リスタート</button>
+        <button class="restart" @click.stop.prevent="restart">リスタート</button>
     </div>
 
 </template>

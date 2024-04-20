@@ -5,8 +5,13 @@
     padding: 0;
 }
 
+html {
+    overflow: hidden;
+}
+
 body {
     font-family: "Stick", sans-serif;
+    overflow: hidden;
 }
 
 button {
