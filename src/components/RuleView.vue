@@ -45,10 +45,12 @@ const emit = defineEmits(["on-click"]);
     background-color: rgb(0, 0, 0, 0.5);
     z-index: 80;
     transition: 0.3s;
+    opacity: 0;
 }
 
 .back.show {
-    top: 0
+    top: 0;
+    opacity: 1;
 }
 
 .content {
