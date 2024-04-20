@@ -70,6 +70,7 @@ button.gameStart {
     display: block;
     width: 70%;
     height: 40px;
+    color: darkgreen;
     background-color: white;
     border: 2px solid darkgreen;
     border-radius: 20px;
