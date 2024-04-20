@@ -54,7 +54,7 @@ const preventEventCondition = computed(() =>
 onMounted(() => {
     const html = <HTMLHtmlElement>document.querySelector("html");
 
-    let startX: number, endX: number, startY: number, endY: number
+    let startX: number | null, endX: number | null, startY: number | null, endY: number | null
 
     html.addEventListener("touchstart", (e) => {
         if (preventEventCondition.value) return;
@@ -72,7 +72,7 @@ onMounted(() => {
 
         function calcDir(dY: number, dX: number) {
 
-            if (Math.abs(dX) + Math.abs(dY) < 10) return null
+            //if (Math.abs(dX) + Math.abs(dY) < 10) return null
             if (dX == 0 && dY > 0) return yx(1, 0)
             if (dX == 0 && dY < 0) return yx(-1, 0)
             const tangent = dY / dX
@@ -87,9 +87,13 @@ onMounted(() => {
             return null
         }
 
+        if (startY == null || startX == null || endY == null || endX == null) return
         const dir = calcDir(endY - startY, endX - startX)
+
         if (dir === null) return;
         DoAfterCalcDir(dir)
+
+        startY = null; endY = null; startX = null; startY = null;
     })
 
     html.addEventListener("keydown", (e) => {
@@ -197,17 +201,17 @@ function noMove(matrix: Panel[][]) {
 const renderKey = ref(0);
 //リスタートボタンを押すと
 const restart = () => {
-    // gameOver.value = false;
-    // gameClear.value = false;
-    // afterClear.value = false;
-    // score.value = 0;
-    // panels.value = [];
+    gameOver.value = false;
+    gameClear.value = false;
+    afterClear.value = false;
+    score.value = 0;
+    panels.value = [];
 
-    // transition.value = false;
-    // highScore.value = getHighScore(cellNum.value)
+    transition.value = false;
+    highScore.value = getHighScore(cellNum.value)
 
-    // putPanel();
-    // putPanel();
+    putPanel();
+    putPanel();
 
 }
 //そのまま続けるボタンを押すと
@@ -264,9 +268,9 @@ const fieldStyle = computed(() => {
 
 button.restart {
     width: 70%;
-    padding: 5px 0;
+    padding: 3px 0;
     font-size: 1.2rem;
-    margin: 50px auto 0;
+    margin: 40px auto 0;
     background-color: white;
     color: darkgreen;
     border: 2px solid darkgreen;

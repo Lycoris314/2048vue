@@ -39,6 +39,14 @@ div.score {
     place-content: center;
 }
 
+@media screen and (max-width: 500px) {
+
+    div.highScore,
+    div.score {
+        width: 90px;
+    }
+}
+
 div.scores p {
     text-align: center;
 }
