@@ -247,7 +247,7 @@ const fieldStyle = computed(() => {
         <Cells></Cells>
 
         <Panels :panels="panels" :transition="transition"></Panels>
-        <button class="restart" @click.stop.prevent="restart">リスタート</button>
+        <!-- <button class="restart" @click="restart">リスタート</button> -->
     </div>
 
 </template>
@@ -264,9 +264,7 @@ const fieldStyle = computed(() => {
     position: relative;
 }
 
-
-
-button.restart {
+/* button.restart {
     width: 70%;
     padding: 3px 0;
     font-size: 1.2rem;
@@ -279,5 +277,5 @@ button.restart {
 
 button.restart:hover {
     background-color: rgb(222, 255, 222);
-}
+} */
 </style>
