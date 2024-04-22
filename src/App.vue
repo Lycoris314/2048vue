@@ -35,8 +35,6 @@ const toggleRule = () => {
 onMounted(() => {
   window.addEventListener("resize", () => {
     windowWidth.value = window.innerWidth
-    console.log(windowWidth.value, cellSize.value);
-
   })
 })
 

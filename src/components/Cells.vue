@@ -8,7 +8,6 @@ const cellNumTotal = computed(() =>
     new Array(cellNum.value ** 2))
 
 const cellStyle = computed(() => {
-    console.log(cellSize.value);
 
     return {
         width: `${cellSize.value}px`,
