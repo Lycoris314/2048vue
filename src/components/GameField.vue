@@ -137,17 +137,13 @@ function DoAfterCalcDir(dir: YX) {
     //以下移動アニメーション用
     transition.value = true;
 
+
     moveLengthArr.forEach(elm => {
         elm[0].slide(YX.scalar(elm[1], dir));
     })
 
-    new Promise(resolve => {
-        setTimeout(() => {
-            resolve("");
-        }, 300)
-    }).then(() => {
-        //移動アニメーション終わり
-        transition.value = false;
+
+    setTimeout(() => {
 
         panels.value = nextGenePanels
 
@@ -165,18 +161,23 @@ function DoAfterCalcDir(dir: YX) {
 
         putPanel();
 
+        transition.value = false;
+
         //ゲームクリアの時
         if (isGameClear() && !afterClear.value) {
             gameClear.value = true;
             updateHighScore(cellNum.value, score.value);
-
         }
         //ゲームオーバーの時
         else if (isGameOver()) {
             gameOver.value = true;
             updateHighScore(cellNum.value, score.value);
         }
-    })
+
+
+
+    }, 250)
+
 }
 
 function isGameClear() {

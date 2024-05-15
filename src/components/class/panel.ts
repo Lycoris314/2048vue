@@ -31,7 +31,7 @@ export class Panel {
         this.popAnimation = true;
         setTimeout(() => {
             this.popAnimation = false;
-        }, 300);
+        }, 250);
 
         this.growAnimation = false;
     }
@@ -49,7 +49,7 @@ export class Panel {
         this.growAnimation = true;
         setTimeout(() => {
             this.growAnimation = false;
-        }, 300);
+        }, 250);
     }
 
     slide(vec: YX) {

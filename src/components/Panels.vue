@@ -20,10 +20,11 @@ const panelStyle = (panel: Panel) => {
     }
 }
 
+
 </script>
 
 <template>
-    <div class="panel" v-for="panel of props.panels" :style="panelStyle(panel)" :class="{
+    <div class="panel" v-for="(panel, index) of props.panels" :key="index" :style="panelStyle(panel)" :class="{
         transition: props.transition,
         popAnimation: panel.popAnimation,
         growAnimation: panel.growAnimation
@@ -42,7 +43,7 @@ const panelStyle = (panel: Panel) => {
 }
 
 .transition {
-    transition: 0.2s;
+    transition: 0.25s;
 }
 
 .popAnimation {
